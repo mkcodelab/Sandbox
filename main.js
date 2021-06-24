@@ -258,7 +258,6 @@ function drawOcean(y) {
     // console.log('ocean drawed')
     
 }
-
 function handleMouseCollision() {
     let obj1 = mouse;
     for (let i = 0; i < blockArr.length; i++){
