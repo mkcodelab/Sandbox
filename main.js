@@ -360,8 +360,6 @@ function animate() {
         waterLevel += 0.1;
     }
     drawOcean(waterHeight);
-    
-
     requestAnimationFrame(animate)
 }
 animate();
