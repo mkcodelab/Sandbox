@@ -18,7 +18,7 @@ let blockSize = 10;
 let groundLine = 0;
 
 class Block {
-    constructor(x, y, size, col, ){
+    constructor(x, y, size){
         this.x = x;
         this.y = y;
         this.dx = 0;
@@ -90,17 +90,16 @@ window.addEventListener('keyup', function(e){
 })
 
 function drawBg(){
-    ctx.fillStyle = 'rgba(0,0,0,.2)';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    // ctx.fillStyle = '#222';
-    // let x =  mouse.x;
-    // let y = mouse.y;
-    // let size = 10;
-    // for (let i = 0; i < 10; i++) {
-    //     ctx.fillRect(i * size + x, i * size + y, size, size);
+    // ctx.fillStyle = 'rgba(0,0,0, 0.1)';
+    // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // }
+    let gradient = ctx.createLinearGradient(canvas.width/2, 0, canvas.width/2, canvas.height);
+    gradient.addColorStop(0, 'rgba(0, 0, 25, 0.5)');
+    gradient.addColorStop(1, 'rgba(100, 100, 200, 0.5');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
+
 function rectIntersect(x1, y1, w1, h1, x2, y2, w2, h2){
     if (x2 > w1 + x1 || x1 > w2 + x2 || y2 > h1 + y1 || y1 > h2 + y2){
         return false;
@@ -139,8 +138,7 @@ function drawBlocks(){
             let x = mouse.x + mouse.size * i * 3;
             let y = mouse.y * Math.random();
             let size = Math.random() * 10 + 5;
-            let col = '#333';
-            blockArr.push (new Block(x, y, size, col));
+            blockArr.push (new Block(x, y, size));
     }
     console.log('ground has been created!')
 }
@@ -177,7 +175,7 @@ class Plant {
 }
 
 let waterArr = [];
-let waterDroplets = 100;
+let waterDroplets = 10;
 
 let waterLevel = 5;
 let waterHeight = canvas.height - waterLevel;
@@ -189,18 +187,17 @@ function handleWaterLevel() {
 
 class Water {
     constructor(x, y){
-        this.size = Math.random() * 10 + 3;
+        this.size = Math.random() * 10 + 1;
         this.x = x;
         this.y = y;
-        this.dx = 0;
+        this.LOrR = Math.random() > 0.5 ? -1 : 1;
+        this.dx = Math.random() * this.LOrR;
         this.dy = grav;
-        this.shadeOfBlue = Math.random() * 120 + 100;
+        this.col = 'rgba(120, 150, 200, 0.05)'
+        // this.shadeOfBlue = Math.random() * 120 + 100;
     }
     draw() {
-        
-        let col = `rgba(120, 150, ${this.shadeOfBlue}, 0.01)`;
-
-        ctx.fillStyle = col;
+        ctx.fillStyle = this.col;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
@@ -212,7 +209,6 @@ class Water {
             
         // }
         this.y += this.dy;
-        
         this.x += this.dx;
 
     }
@@ -245,7 +241,7 @@ function plant(color, size){
 
 function drawOcean(y) {
 
-    ctx.strokeStyle = 'rgba(100, 100, 255, 0.2)';
+    ctx.strokeStyle = 'rgba(50, 100, 200, 0.5)';
     ctx.lineWidth = 2;
 
     ctx.beginPath();
@@ -253,20 +249,19 @@ function drawOcean(y) {
     ctx.lineTo(canvas.width, y);
     ctx.closePath();
     ctx.stroke();
-    ctx.fillStyle = 'rgba(100, 150, 255, 0.1)';
+    ctx.fillStyle = 'rgba(100, 220, 250, 0.1)';
     ctx.fillRect(0, y, canvas.width, canvas.height)
-    // console.log('ocean drawed')
     
 }
 function handleMouseCollision() {
     let obj1 = mouse;
     for (let i = 0; i < blockArr.length; i++){
         let obj2 = blockArr[i];
+
         if(rectIntersect(obj1.x, obj1.y, obj1.size, obj1.size,
             obj2.x, obj2.y, obj2.size, obj2.size)){
                 mouse.isColliding = true;
-                // console.log('colliding');
-                // console.log(obj1, obj2)
+               
                 return obj2;
             }
         else {
@@ -299,13 +294,13 @@ window.addEventListener('mousedown', function(){
         // waterSpray();
         waterPouring = true;
         waterLevel += 1;
-        console.log('pouring water')
     }
 })
+
 window.addEventListener('mouseup', function() {
     waterPouring = false;
-    console.log('pouring stopped')
 })
+
 window.addEventListener('click', function(){
     if (mouse.currentTool == 'ground'){
         drawBlocks();
@@ -324,12 +319,6 @@ window.addEventListener('click', function(){
         drawEffect(mouse.x, mouse.y, 120, 'rgba(100, 255, 25, 0.3)')
 
     }
-    // if (mouse.currentTool == 'water'){
-    //     waterSpray();
-    //     waterLevel += 1;
-    //     console.log(waterLevel)
-    // }
-
 });
 
 function animate() {
