@@ -241,7 +241,6 @@ function plant(color, size){
     ctx.closePath();
 }
 
-
 // ** {{  = = | M*ss Ocean (y) ;* | = = }} **
 
 function drawOcean(y) {
