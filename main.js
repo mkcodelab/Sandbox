@@ -10,7 +10,12 @@ window.addEventListener('resize', setSize);
 
 const grav = 10;
 
-let sandColArr = ['#55c200', '#c8c820', '#578840', '#2c5f20', '#668822','#77AA11'];
+let groundColArr = 
+[
+'#704d00',
+'#a37f31',
+'#dbae4b',
+];
 let blockArr = [];
 let blockQuantityPerClick = 10;
 let blockSize = 10;
@@ -24,7 +29,7 @@ class Block {
         this.dx = 0;
         this.dy = grav + Math.random() * 5;
         this.size = size;
-        this.col = sandColArr[Math.floor(Math.random() * sandColArr.length)];
+        this.col = groundColArr[Math.floor(Math.random() * groundColArr.length)];
         this.top = this.y;
         this.bottom = this.y + this.size;
         this.isColliding = false;
@@ -54,10 +59,17 @@ class Block {
 let mouse = {
     x: null,
     y: null,
-    size: 5,
+    size: 20,
     tools: ['ground', 'shovel', 'plant', 'water'],
     currentTool: 'ground',
     isColliding : false,
+    draw() {
+        ctx.fillStyle = 'rgba(200,200,200, 0.1)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.closePath();
+    }
 }
 
 
@@ -107,6 +119,7 @@ function rectIntersect(x1, y1, w1, h1, x2, y2, w2, h2){
     return true;
 }
 
+
 function detectCollisions(){
     let obj1;
     let obj2;
@@ -134,9 +147,11 @@ function detectCollisions(){
 
 //(canvas.width / (blockSize * blockQuantityPerClick))
 function drawBlocks(){
+    
     for (let i = 0; i < blockQuantityPerClick; i++)  {
-            let x = mouse.x + mouse.size * i * 3;
-            let y = mouse.y * Math.random();
+            // let x = mouse.x + mouse.size * i ;
+            let x = mouse.x + (mouse.size/2 + 5) * i;
+            let y = mouse.y - Math.random() * 100;
             let size = Math.random() * 10 + 5;
             blockArr.push (new Block(x, y, size));
     }
@@ -144,7 +159,7 @@ function drawBlocks(){
 }
 function eraseBlock(){
     
-    let obj1 = mouse;
+    // let obj1 = mouse;
     let obj2 = handleMouseCollision();
     let index = blockArr.indexOf(obj2);
     console.log(index)
@@ -175,9 +190,9 @@ class Plant {
 }
 
 let waterArr = [];
-let waterDroplets = 10;
+let waterDroplets = 5;
 
-let waterLevel = 5;
+let waterLevel = 20;
 let waterHeight = canvas.height - waterLevel;
 
 function handleWaterLevel() {
@@ -204,13 +219,8 @@ class Water {
         ctx.closePath();
     }
     update() {
-    
-        // if (this.y < canvas.height - this.size) {
-            
-        // }
         this.y += this.dy;
         this.x += this.dx;
-
     }
 }
 
@@ -218,6 +228,8 @@ function waterSpray() {
     for (let i = 0; i < waterDroplets; i++){
         waterArr.push( new Water(mouse.x, mouse.y) )
     }
+    let randomRadius = Math.random() * 30 + 5;
+    drawEffect(mouse.x, mouse.y, randomRadius, 'rgba(100, 100, 200, 0.2)')
     
 }
 function handleWaterBubbles() {
@@ -242,15 +254,26 @@ function plant(color, size){
 function drawOcean(y) {
 
     ctx.strokeStyle = 'rgba(50, 100, 200, 0.5)';
-    ctx.lineWidth = 2;
-
+    ctx.lineWidth = 3;
+    
     ctx.beginPath();
     ctx.moveTo(0, y);
     ctx.lineTo(canvas.width, y);
     ctx.closePath();
     ctx.stroke();
-    ctx.fillStyle = 'rgba(100, 220, 250, 0.1)';
+    ctx.fillStyle = 'rgba(50, 160, 180, 0.3)';
     ctx.fillRect(0, y, canvas.width, canvas.height)
+
+    // for (let i = 0; i < 50; i++){
+    //     let bubbleX = Math.random() * canvas.width;
+    //     let bubbleY = y + Math.random() * 2;
+    //     let size = Math.random();
+    //     ctx.strokeStyle = 'skyblue';
+    //     ctx.beginPath();
+    //     ctx.arc(bubbleX, bubbleY, size, 0, Math.PI * 2);
+    //     ctx.stroke();
+    //     ctx.closePath;
+    // }
     
 }
 function handleMouseCollision() {
@@ -295,6 +318,9 @@ window.addEventListener('mousedown', function(){
         waterPouring = true;
         waterLevel += 1;
     }
+    if (mouse.currentTool == 'shovel'){
+        eraseBlock();
+    }
 })
 
 window.addEventListener('mouseup', function() {
@@ -308,10 +334,10 @@ window.addEventListener('click', function(){
     
     }
     
-    if (mouse.currentTool == 'shovel'){
-        eraseBlock();
-        drawEffect(mouse.x, mouse.y, 100, 'rgba(100, 100, 100, 0.5)')
-    }
+    // if (mouse.currentTool == 'shovel'){
+    //     eraseBlock();
+    //     drawEffect(mouse.x, mouse.y, 100, 'rgba(100, 100, 100, 0.5)')
+    // }
     if (mouse.currentTool == 'plant'){
         let col = 'rgba(150, 255, 55, 0.1)';
         let size = Math.random() * 20 + 2;
@@ -347,6 +373,7 @@ function animate() {
         waterLevel += 0.1;
     }
     drawOcean(waterHeight);
+    // mouse.draw();
     requestAnimationFrame(animate)
 }
 animate();
